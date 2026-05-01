@@ -1,0 +1,161 @@
+{
+  "$schema": "design-tokens-v1",
+  "meta": {
+    "source": "REPLACE_WITH_SOURCE_URL",
+    "extracted": "YYYY-MM-DD",
+    "confidence": "REPLACE: Free-text paragraph explaining what was confirmed vs. inferred. Mention any access failures."
+  },
+
+  "color": {
+    "background": {
+      "page":    { "value": "#FFFFFF", "note": "REPLACE", "confidence": "inferred" },
+      "surface": { "value": "#FFFFFF", "note": "REPLACE", "confidence": "inferred" },
+      "inverse": { "value": "#000000", "note": "REPLACE", "confidence": "inferred" }
+    },
+    "ink": {
+      "primary":   { "value": "#000000", "note": "REPLACE", "confidence": "inferred" },
+      "secondary": { "value": "#555555", "note": "REPLACE", "confidence": "inferred" },
+      "muted":     { "value": "#999999", "note": "REPLACE", "confidence": "inferred" },
+      "inverse":   { "value": "#FFFFFF", "note": "REPLACE", "confidence": "inferred" }
+    },
+    "accent": {
+      "signal":  { "value": "#0066FF", "note": "REPLACE", "confidence": "inferred" }
+    },
+    "rule": {
+      "hairline": { "value": "rgba(0,0,0,0.10)", "note": "REPLACE", "confidence": "inferred" }
+    }
+  },
+
+  "typography": {
+    "family": {
+      "display": { "value": "system-ui, sans-serif", "note": "REPLACE with actual face + fallback chain", "confidence": "inferred" },
+      "body":    { "value": "system-ui, sans-serif", "note": "REPLACE", "confidence": "inferred" },
+      "mono":    { "value": "ui-monospace, monospace", "note": "REPLACE", "confidence": "inferred" }
+    },
+    "weight": {
+      "regular": 400,
+      "medium":  500,
+      "bold":    700
+    },
+    "scale": {
+      "hero":     { "size": "72px", "lineHeight": "1.05", "tracking": "-0.02em",  "weight": 500, "use": "REPLACE", "confidence": "inferred" },
+      "headline": { "size": "48px", "lineHeight": "1.1",  "tracking": "-0.015em", "weight": 500, "use": "REPLACE", "confidence": "inferred" },
+      "title":    { "size": "28px", "lineHeight": "1.25", "tracking": "-0.01em",  "weight": 500, "use": "REPLACE", "confidence": "inferred" },
+      "body":     { "size": "18px", "lineHeight": "1.5",  "tracking": "0",        "weight": 400, "use": "REPLACE", "confidence": "inferred" },
+      "small":    { "size": "14px", "lineHeight": "1.45", "tracking": "0",        "weight": 400, "use": "REPLACE", "confidence": "inferred" },
+      "metric":   { "size": "56px", "lineHeight": "1.0",  "tracking": "-0.02em",  "weight": 500, "use": "REPLACE", "confidence": "inferred" },
+      "code":     { "size": "14px", "lineHeight": "1.6",  "tracking": "0",        "weight": 400, "use": "REPLACE", "confidence": "inferred" },
+      "eyebrow":  { "size": "12px", "lineHeight": "1.2",  "tracking": "0.08em",   "weight": 500, "use": "REPLACE", "transform": "uppercase", "confidence": "inferred" }
+    }
+  },
+
+  "space": {
+    "scale": {
+      "0":  "0px",
+      "1":  "4px",
+      "2":  "8px",
+      "3":  "12px",
+      "4":  "16px",
+      "5":  "24px",
+      "6":  "32px",
+      "7":  "48px",
+      "8":  "64px",
+      "9":  "96px",
+      "10": "128px",
+      "11": "192px"
+    },
+    "rhythm": {
+      "section-y":    "var(--space-10)",
+      "subsection-y": "var(--space-8)",
+      "card-pad":     "var(--space-6)",
+      "stack-tight":  "var(--space-3)",
+      "stack":        "var(--space-5)",
+      "stack-loose":  "var(--space-7)"
+    },
+    "container": {
+      "max":    "1200px",
+      "gutter": "24px"
+    }
+  },
+
+  "radius": {
+    "none": "0px",
+    "sm":   "4px",
+    "md":   "8px",
+    "lg":   "16px",
+    "pill": "9999px",
+    "default-element": "var(--radius-md)",
+    "default-card":    "var(--radius-lg)",
+    "note": "REPLACE — describe the radius philosophy of the brand"
+  },
+
+  "border": {
+    "hairline": "1px solid var(--color-rule-hairline)",
+    "emphasis": "1.5px solid var(--color-ink-primary)"
+  },
+
+  "shadow": {
+    "none": "none",
+    "card": "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)",
+    "lift": "0 8px 24px rgba(0,0,0,0.08)",
+    "note": "REPLACE — describe the elevation philosophy"
+  },
+
+  "motion": {
+    "library": {
+      "primary": "REPLACE — e.g. gsap@3.12, framer-motion, or 'css-only' or 'unknown'",
+      "secondary": [],
+      "detection-method": "REPLACE — e.g. 'script src urls', 'data-projection-id attrs', 'inferred from behavior'",
+      "confidence": "inferred"
+    },
+    "duration": {
+      "instant": "80ms",
+      "fast":    "160ms",
+      "base":    "240ms",
+      "slow":    "480ms"
+    },
+    "easing": {
+      "standard": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+      "entrance": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "linear":   "linear"
+    },
+    "patterns": {
+      "fade-in-up": {
+        "from": "opacity:0, translateY:8px",
+        "to":   "opacity:1, translateY:0",
+        "duration": "var(--motion-duration-slow)",
+        "easing": "var(--motion-easing-entrance)",
+        "stagger": "0.08s",
+        "trigger": "REPLACE — e.g. page-load, viewport-enter, hover",
+        "reduced-motion": "skip to final state",
+        "confidence": "inferred"
+      }
+    },
+    "scroll": {
+      "_comment": "Delete if no scroll-driven motion observed. Otherwise document smooth-scroll lib and trigger defaults."
+    },
+    "reduced-motion": {
+      "policy": "respect-prefers-reduced-motion",
+      "fallback": "instant-final-state"
+    }
+  },
+
+  "texture": {
+    "_comment": "Delete this block if the brand has no signature texture. Otherwise document the recipe.",
+    "example-halftone": {
+      "note": "REPLACE",
+      "implementation-hint": "radial-gradient at small intervals",
+      "dot-color": "var(--color-ink-muted)",
+      "dot-size":  "1.5px",
+      "spacing":   "6px"
+    }
+  },
+
+  "z-index": {
+    "base":    0,
+    "raised":  10,
+    "sticky":  100,
+    "overlay": 1000,
+    "modal":   1100
+  }
+}

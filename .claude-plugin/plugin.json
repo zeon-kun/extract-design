@@ -1,0 +1,18 @@
+{
+  "name": "extract-design",
+  "description": "A dedicated pipeline to extract design comprehensively from tokens, atoms, and sub-components (dom analysis included)",
+  "version": "1.0.0",
+  "author": {
+    "name": "Muhammad Rafif Tri Risqullah",
+    "email": "rafif.zeon@gmail.com"
+  },
+  "homepage": "https://github.com/zeon-kun/extract-design",
+  "repository": "https://github.com/zeon-kun/extract-design",
+  "license": "MIT",
+  "keywords": [
+    "extract-design",
+    "atoms",
+    "design-system",
+    "pencil-integrated"
+  ]
+}

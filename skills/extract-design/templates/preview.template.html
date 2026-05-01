@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{BRAND}} — Design System</title>
+<style>
+  /* ─── TOKENS ──────────────────────────────────────────────────────────────
+     Mirror tokens.json as CSS custom properties.
+     Every value here must also exist in tokens.json with a confidence flag.
+     ──────────────────────────────────────────────────────────────────────── */
+  :root {
+    /* COLOR */
+    --color-bg-page:    #FFFFFF;
+    --color-bg-surface: #F8F8F8;
+    --color-bg-inverse: #0A0A0A;
+
+    --color-ink-primary:   #0A0A0A;
+    --color-ink-secondary: #555555;
+    --color-ink-muted:     #999999;
+    --color-ink-inverse:   #FFFFFF;
+
+    --color-accent-signal: #0066FF;
+    --color-rule-hairline: rgba(0,0,0,0.08);
+
+    /* TYPOGRAPHY */
+    --font-display: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body:    system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono:    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* SPACE */
+    --space-1:  4px;
+    --space-2:  8px;
+    --space-3:  12px;
+    --space-4:  16px;
+    --space-5:  24px;
+    --space-6:  32px;
+    --space-7:  48px;
+    --space-8:  64px;
+    --space-9:  96px;
+    --space-10: 128px;
+
+    /* RADIUS */
+    --radius-none: 0px;
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:   16px;
+    --radius-xl:   24px;
+    --radius-pill: 9999px;
+
+    /* SHADOW */
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-lift: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+
+    /* MOTION */
+    --duration-fast:   160ms;
+    --duration-base:   240ms;
+    --duration-slow:   480ms;
+    --easing-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+    --easing-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ─── LAYOUT ──────────────────────────────────────────────────────────
+       page-gutter: 24px on mobile → scales to 120px on wide desktop.
+       This is the primary fix for the left/right breathing room.
+       ──────────────────────────────────────────────────────────────────── */
+    --page-gutter:   clamp(24px, 7vw, 120px);
+    --container-max: 1360px;
+    --section-y:     clamp(80px, 10vw, 140px);
+    --subsection-y:  clamp(48px, 6vw, 80px);
+  }
+
+  /* ─── RESET ─────────────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    margin: 0;
+    background: var(--color-bg-page);
+    color: var(--color-ink-primary);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3, h4, p, ul, ol { margin: 0; }
+  ul, ol { padding: 0; list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: var(--color-accent-signal); color: #fff; }
+
+  /* ─── LAYOUT PRIMITIVES ─────────────────────────────────────────────────── */
+  .container {
+    width: 100%;
+    max-width: calc(var(--container-max) + var(--page-gutter) * 2);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--page-gutter);
+    padding-right: var(--page-gutter);
+  }
+  .section {
+    padding-top: var(--section-y);
+    padding-bottom: var(--section-y);
+  }
+  .hairline { height: 1px; border: 0; background: var(--color-rule-hairline); margin: 0; }
+
+  /* Stack */
+  .stack   { display: flex; flex-direction: column; }
+  .stack   > * + * { margin-top: var(--space-5); }
+  .stack-sm > * + * { margin-top: var(--space-3); }
+  .stack-lg > * + * { margin-top: var(--space-7); }
+
+  /* ─── TYPOGRAPHY ─────────────────────────────────────────────────────────── */
+  .t-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+  }
+  .t-hero {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 8vw, 96px);
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+  .t-headline {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+  .t-title {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 2.5vw, 28px);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+  .t-body  { font-size: 17px; line-height: 1.55; }
+  .t-small { font-size: 14px; line-height: 1.5; }
+  .t-mono  { font-family: var(--font-mono); font-size: 13px; line-height: 1.6; }
+  .ink-2   { color: var(--color-ink-secondary); }
+  .ink-3   { color: var(--color-ink-muted); }
+  .accent  { color: var(--color-accent-signal); }
+
+  /* ─── ATOMS ──────────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 14px var(--space-6);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: opacity var(--duration-fast) var(--easing-standard),
+                box-shadow var(--duration-fast) var(--easing-standard),
+                transform var(--duration-fast) var(--easing-standard);
+    text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: var(--color-ink-primary); color: var(--color-ink-inverse); }
+  .btn-primary:hover { box-shadow: var(--shadow-lift); opacity: 1; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink-primary);
+    border-color: var(--color-rule-hairline);
+  }
+  .btn-ghost:hover { background: rgba(0,0,0,0.04); opacity: 1; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--color-rule-hairline);
+    color: var(--color-ink-secondary);
+  }
+  .inline-code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-bg-surface);
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-rule-hairline);
+  }
+
+  /* ─── NAV ────────────────────────────────────────────────────────────────── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-bg-page) 80%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-rule-hairline);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .nav-mark { font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+  .nav-links { display: flex; align-items: center; gap: var(--space-7); }
+  .nav-link {
+    font-size: 14px;
+    color: var(--color-ink-secondary);
+    transition: color var(--duration-fast) var(--easing-standard);
+  }
+  .nav-link:hover { color: var(--color-ink-primary); }
+  @media (max-width: 640px) { .nav-links { gap: var(--space-4); } }
+  @media (max-width: 480px) {
+    .nav-links a[href="#identity"],
+    .nav-links a[href="#audit"]  { display: none; }
+  }
+
+  /* ─── SECTION HEADER ─────────────────────────────────────────────────────
+     Number + eyebrow label on the left, title + description on the right.
+     This creates natural indentation for the section content below.
+     ──────────────────────────────────────────────────────────────────────── */
+  .section-header {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-8);
+    margin-bottom: var(--subsection-y);
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .section-header { grid-template-columns: 1fr; gap: var(--space-5); }
+  }
+  .section-index { display: flex; flex-direction: column; gap: var(--space-2); padding-top: 6px; }
+  .section-num   { font-family: var(--font-mono); font-size: 13px; color: var(--color-ink-muted); }
+
+  /* ─── TOKEN ROW ──────────────────────────────────────────────────────────
+     Left column = category label (160px). Right column = token content.
+     Each row is separated by a hairline. Gives the doc an editorial feel.
+     ──────────────────────────────────────────────────────────────────────── */
+  .token-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--space-8);
+    padding: var(--subsection-y) 0;
+    border-top: 1px solid var(--color-rule-hairline);
+  }
+  @media (max-width: 900px) {
+    .token-row { grid-template-columns: 1fr; gap: var(--space-5); }
+  }
+  .token-row-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-muted);
+    font-weight: 600;
+    padding-top: 4px;
+  }
+
+  /* ─── COLOR SWATCHES ─────────────────────────────────────────────────────── */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-4);
+  }
+  .swatch {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-rule-hairline);
+  }
+  .swatch-chip { height: 120px; width: 100%; }
+  .swatch-meta {
+    padding: var(--space-4) var(--space-4) var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background: var(--color-bg-surface);
+  }
+  .swatch-name { font-size: 13px; font-weight: 500; }
+  .swatch-hex  { font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-secondary); }
+  .swatch-conf { font-family: var(--font-mono); font-size: 10px; color: var(--color-ink-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ─── TYPOGRAPHY SPECIMEN ────────────────────────────────────────────────── */
+  .specimen-table {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-rule-hairline);
+  }
+  .specimen-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 140px;
+    gap: var(--space-5);
+    padding: var(--space-6) var(--space-7);
+    border-bottom: 1px solid var(--color-rule-hairline);
+    align-items: center;
+  }
+  .specimen-row:nth-child(odd) { background: var(--color-bg-surface); }
+  .specimen-row:last-child { border-bottom: none; }
+  @media (max-width: 768px) {
+    .specimen-row { grid-template-columns: 1fr; gap: var(--space-2); padding: var(--space-5); }
+  }
+  .specimen-label { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .specimen-meta  { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-muted); text-align: right; line-height: 1.8; }
+  @media (max-width: 768px) { .specimen-meta { text-align: left; } }
+
+  /* ─── SPACING TABLE ──────────────────────────────────────────────────────── */
+  .space-table {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-rule-hairline);
+  }
+  .space-row {
+    display: grid;
+    grid-template-columns: 96px 48px 1fr;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-rule-hairline);
+    align-items: center;
+  }
+  .space-row:nth-child(odd) { background: var(--color-bg-surface); }
+  .space-row:last-child { border-bottom: none; }
+  .space-token-name { font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-secondary); }
+  .space-token-val  { font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-muted); }
+  .space-bar-wrap   { display: flex; align-items: center; }
+  .space-bar        { background: var(--color-ink-primary); height: 8px; border-radius: 2px; opacity: 0.15; }
+
+  /* ─── RADIUS ─────────────────────────────────────────────────────────────── */
+  .radius-grid { display: flex; gap: var(--space-6); flex-wrap: wrap; align-items: flex-end; }
+  .radius-cell { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+  .radius-shape { width: 72px; height: 72px; background: var(--color-ink-primary); opacity: 0.9; }
+  .radius-cell.pill .radius-shape { width: 120px; height: 40px; }
+
+  /* ─── SHADOW ─────────────────────────────────────────────────────────────── */
+  .shadow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-6);
+  }
+  .shadow-cell { display: flex; flex-direction: column; gap: var(--space-4); }
+  .shadow-demo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--color-bg-page);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-ink-muted);
+  }
+
+  /* ─── MOTION PREVIEW CARDS ───────────────────────────────────────────────── */
+  .motion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+  @media (max-width: 640px) { .motion-grid { grid-template-columns: 1fr; } }
+  .motion-card {
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--color-rule-hairline);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    cursor: default;
+  }
+  .motion-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .motion-track {
+    height: 3px;
+    background: var(--color-rule-hairline);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+  }
+  .motion-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--color-accent-signal);
+    border-radius: var(--radius-pill);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .motion-card:hover .motion-fill { animation: motion-play 1s both; }
+  .motion-card[data-dur="fast"]:hover .motion-fill  { animation-duration: var(--duration-fast);  animation-timing-function: var(--easing-standard); }
+  .motion-card[data-dur="base"]:hover .motion-fill  { animation-duration: var(--duration-base);  animation-timing-function: var(--easing-standard); }
+  .motion-card[data-dur="slow"]:hover .motion-fill  { animation-duration: var(--duration-slow);  animation-timing-function: var(--easing-entrance); }
+  .motion-card[data-dur="enter"]:hover .motion-fill { animation-duration: var(--duration-slow);  animation-timing-function: var(--easing-entrance); }
+  @keyframes motion-play { to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: reduce) { .motion-fill { animation: none !important; } }
+
+  /* ─── ATOM CARDS ─────────────────────────────────────────────────────────── */
+  .atom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-5);
+  }
+  .atom-card {
+    border: 1px solid var(--color-rule-hairline);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .atom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-rule-hairline);
+    background: var(--color-bg-surface);
+  }
+  .atom-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-secondary);
+  }
+  .atom-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding: var(--space-7) var(--space-6);
+    background: var(--color-bg-page);
+  }
+  .atom-anatomy {
+    padding: var(--space-4) var(--space-5);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--color-ink-secondary);
+    border-top: 1px solid var(--color-rule-hairline);
+    background: var(--color-bg-surface);
+  }
+  .atom-anatomy b { color: var(--color-ink-primary); font-weight: 500; }
+
+  /* ─── COMPONENT RECONSTRUCTIONS ─────────────────────────────────────────── */
+  .recon-block {
+    margin-top: var(--space-7);
+    border: 1px solid var(--color-rule-hairline);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+  .recon-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+    background: var(--color-bg-surface);
+    border-bottom: 1px solid var(--color-rule-hairline);
+  }
+  .recon-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-ink-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .recon-name::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--color-accent-signal);
+    border-radius: var(--radius-pill);
+    flex-shrink: 0;
+  }
+  .recon-body { padding: var(--space-8); }
+  @media (max-width: 640px) { .recon-body { padding: var(--space-6); } }
+
+  /* ─── BRAND IDENTITY ─────────────────────────────────────────────────────── */
+  .brand-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: var(--space-10);
+    align-items: start;
+  }
+  @media (max-width: 900px) { .brand-grid { grid-template-columns: 1fr; gap: var(--space-7); } }
+  .principles { display: flex; flex-direction: column; }
+  .principle {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--color-rule-hairline);
+    align-items: start;
+  }
+  .principle:last-child { border-bottom: 1px solid var(--color-rule-hairline); }
+  .principle-num  { font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-muted); padding-top: 2px; }
+  .principle-text { font-size: 16px; line-height: 1.5; }
+
+  /* ─── METHODOLOGY ────────────────────────────────────────────────────────── */
+  .audit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: var(--space-10);
+    align-items: start;
+  }
+  @media (max-width: 900px) { .audit-grid { grid-template-columns: 1fr; gap: var(--space-7); } }
+  .audit-items { display: flex; flex-direction: column; }
+  .audit-item {
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-rule-hairline);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-ink-secondary);
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .audit-item:last-child { border-bottom: 1px solid var(--color-rule-hairline); }
+  .audit-dot {
+    width: 6px; height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink-muted);
+    margin-top: 5px;
+  }
+
+  /* ─── PAGE HEADER ────────────────────────────────────────────────────────── */
+  .page-header {
+    padding-top:    clamp(64px, 10vw, 140px);
+    padding-bottom: clamp(64px, 8vw, 112px);
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────────────────────── */
+  .footer { background: var(--color-bg-inverse); color: var(--color-ink-inverse); padding: var(--space-10) 0; }
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-7);
+    align-items: end;
+  }
+  @media (max-width: 640px) { .footer-inner { grid-template-columns: 1fr; } }
+  .footer-brand { font-family: var(--font-display); font-size: clamp(36px, 6vw, 64px); font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+  .footer-meta  { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.35); margin-top: var(--space-3); }
+  .footer-files { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.35); text-align: right; line-height: 2.2; }
+  @media (max-width: 640px) { .footer-files { text-align: left; } }
+
+  /* ─── REVEAL ─────────────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(12px); animation: reveal var(--duration-slow) var(--easing-entrance) forwards; }
+    .reveal:nth-child(2) { animation-delay:  80ms; }
+    .reveal:nth-child(3) { animation-delay: 160ms; }
+    .reveal:nth-child(4) { animation-delay: 240ms; }
+    .reveal:nth-child(5) { animation-delay: 320ms; }
+  }
+  @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────────────────────── -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <span class="nav-mark">{{BRAND}}</span>
+    <div class="nav-links">
+      <a href="#identity" class="nav-link">Identity</a>
+      <a href="#tokens"   class="nav-link">Tokens</a>
+      <a href="#atoms"    class="nav-link">Atoms</a>
+      <a href="#components" class="nav-link">Components</a>
+      <a href="#audit"    class="nav-link">Methodology</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HEADER ───────────────────────────────────────────────────────────── -->
+<header class="container page-header">
+  <div class="stack-lg" style="max-width: 900px;">
+    <span class="t-eyebrow reveal">Design system extraction</span>
+    <h1 class="t-hero reveal">{{BRAND}}</h1>
+    <p class="t-body ink-2 reveal" style="max-width: 560px; font-size: 20px; line-height: 1.5;">
+      {{ONE_SENTENCE_SUMMARY_OF_BRAND_VOICE_AND_VISUAL}}
+    </p>
+    <div class="reveal" style="display:flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-2);">
+      <a class="btn btn-primary" href="#components">View components</a>
+      <a class="btn btn-ghost"   href="#audit">Methodology</a>
+    </div>
+  </div>
+</header>
+
+<hr class="hairline">
+
+<!-- ─── §01 BRAND IDENTITY ───────────────────────────────────────────────── -->
+<section class="section container" id="identity">
+  <div class="section-header">
+    <div class="section-index">
+      <span class="section-num">01</span>
+      <span class="t-eyebrow">Brand identity</span>
+    </div>
+    <div class="stack">
+      <h2 class="t-headline">{{POSITIONING_HEADLINE}}</h2>
+      <p class="t-body ink-2" style="max-width: 600px;">{{POSITIONING_PARAGRAPH}}</p>
+    </div>
+  </div>
+
+  <div class="brand-grid">
+    <div class="stack">
+      <span class="t-eyebrow">Voice principles</span>
+      <p class="t-small ink-2" style="margin-top: var(--space-3);">{{VOICE_PRINCIPLES_PARAGRAPH}}</p>
+    </div>
+    <div>
+      <p class="t-small ink-3" style="margin-bottom: var(--space-4);">Five operating principles synthesized from the source:</p>
+      <div class="principles">
+        <div class="principle reveal"><span class="principle-num">01</span><span class="principle-text">{{PRINCIPLE_1}}</span></div>
+        <div class="principle reveal"><span class="principle-num">02</span><span class="principle-text">{{PRINCIPLE_2}}</span></div>
+        <div class="principle reveal"><span class="principle-num">03</span><span class="principle-text">{{PRINCIPLE_3}}</span></div>
+        <div class="principle reveal"><span class="principle-num">04</span><span class="principle-text">{{PRINCIPLE_4}}</span></div>
+        <div class="principle reveal"><span class="principle-num">05</span><span class="principle-text">{{PRINCIPLE_5}}</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="hairline">
+
+<!-- ─── §02 TOKENS ────────────────────────────────────────────────────────── -->
+<section class="section container" id="tokens">
+  <div class="section-header">
+    <div class="section-index">
+      <span class="section-num">02</span>
+      <span class="t-eyebrow">Tokens</span>
+    </div>
+    <div class="stack">
+      <h2 class="t-headline">Primitive layer</h2>
+      <p class="t-body ink-2" style="max-width: 480px;">Every value here mirrors <span class="inline-code">tokens.json</span>. Each swatch carries a confidence flag.</p>
+    </div>
+  </div>
+
+  <!-- COLOR ─────────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Color</div>
+    <div class="swatch-grid">
+      <!-- Repeat one .swatch per extracted color token -->
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-bg-page); border-bottom: 1px solid var(--color-rule-hairline);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">bg · page</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">confirmed</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-bg-surface);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">bg · surface</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">confirmed</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-bg-inverse);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">bg · inverse</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">confirmed</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-ink-primary);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">ink · primary</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">confirmed</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-ink-secondary);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">ink · secondary</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">inferred-likely</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-chip" style="background: var(--color-accent-signal);"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">accent · signal</div>
+          <div class="swatch-hex">{{HEX}}</div>
+          <div class="swatch-conf">confirmed</div>
+        </div>
+      </div>
+      <!-- + more swatches extracted from Phase 2 -->
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY ─────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Typography</div>
+    <div class="specimen-table">
+      <div class="specimen-row">
+        <span class="specimen-label">Hero</span>
+        <div class="t-hero" style="font-size: clamp(32px, 5vw, 64px);">{{HERO_SAMPLE}}</div>
+        <div class="specimen-meta">{{SIZE}}<br>wt {{WEIGHT}}<br>ls {{TRACKING}}</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Headline</span>
+        <div class="t-headline">{{HEADLINE_SAMPLE}}</div>
+        <div class="specimen-meta">{{SIZE}}<br>wt {{WEIGHT}}<br>ls {{TRACKING}}</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Title</span>
+        <div class="t-title">{{TITLE_SAMPLE}}</div>
+        <div class="specimen-meta">{{SIZE}}<br>wt {{WEIGHT}}<br>ls {{TRACKING}}</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Body</span>
+        <div class="t-body">{{BODY_SAMPLE}}</div>
+        <div class="specimen-meta">17px<br>wt 400<br>ls 0</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Small</span>
+        <div class="t-small" style="color: var(--color-ink-primary);">{{SMALL_SAMPLE}}</div>
+        <div class="specimen-meta">14px<br>wt 400<br>ls 0</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Eyebrow</span>
+        <div class="t-eyebrow" style="color: var(--color-ink-primary);">{{EYEBROW_SAMPLE}}</div>
+        <div class="specimen-meta">11px<br>wt 600<br>tracked</div>
+      </div>
+      <div class="specimen-row">
+        <span class="specimen-label">Mono</span>
+        <div class="t-mono">{{MONO_SAMPLE}}</div>
+        <div class="specimen-meta">13px<br>mono<br>ls 0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPACE ──────────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Space</div>
+    <div class="space-table">
+      <div class="space-row"><span class="space-token-name">--space-1</span><span class="space-token-val">4px</span><div class="space-bar-wrap"><div class="space-bar" style="width:4px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-2</span><span class="space-token-val">8px</span><div class="space-bar-wrap"><div class="space-bar" style="width:8px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-3</span><span class="space-token-val">12px</span><div class="space-bar-wrap"><div class="space-bar" style="width:12px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-4</span><span class="space-token-val">16px</span><div class="space-bar-wrap"><div class="space-bar" style="width:16px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-5</span><span class="space-token-val">24px</span><div class="space-bar-wrap"><div class="space-bar" style="width:24px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-6</span><span class="space-token-val">32px</span><div class="space-bar-wrap"><div class="space-bar" style="width:32px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-7</span><span class="space-token-val">48px</span><div class="space-bar-wrap"><div class="space-bar" style="width:48px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-8</span><span class="space-token-val">64px</span><div class="space-bar-wrap"><div class="space-bar" style="width:64px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-9</span><span class="space-token-val">96px</span><div class="space-bar-wrap"><div class="space-bar" style="width:96px;"></div></div></div>
+      <div class="space-row"><span class="space-token-name">--space-10</span><span class="space-token-val">128px</span><div class="space-bar-wrap"><div class="space-bar" style="width:128px;"></div></div></div>
+    </div>
+  </div>
+
+  <!-- RADIUS ─────────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Radius</div>
+    <div class="radius-grid">
+      <div class="radius-cell"><div class="radius-shape" style="border-radius:0;"></div><span class="t-mono ink-3">none · 0</span></div>
+      <div class="radius-cell"><div class="radius-shape" style="border-radius:4px;"></div><span class="t-mono ink-3">sm · 4</span></div>
+      <div class="radius-cell"><div class="radius-shape" style="border-radius:8px;"></div><span class="t-mono ink-3">md · 8</span></div>
+      <div class="radius-cell"><div class="radius-shape" style="border-radius:16px;"></div><span class="t-mono ink-3">lg · 16</span></div>
+      <div class="radius-cell"><div class="radius-shape" style="border-radius:24px;"></div><span class="t-mono ink-3">xl · 24</span></div>
+      <div class="radius-cell pill"><div class="radius-shape" style="border-radius:9999px;"></div><span class="t-mono ink-3">pill</span></div>
+    </div>
+  </div>
+
+  <!-- SHADOW ─────────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Shadow</div>
+    <div class="shadow-grid">
+      <div class="shadow-cell">
+        <div class="shadow-demo" style="box-shadow:none; border:1px solid var(--color-rule-hairline);">none</div>
+        <span class="t-mono ink-3">shadow · none</span>
+      </div>
+      <div class="shadow-cell">
+        <div class="shadow-demo" style="box-shadow:var(--shadow-card);">card</div>
+        <span class="t-mono ink-3">shadow · card</span>
+      </div>
+      <div class="shadow-cell">
+        <div class="shadow-demo" style="box-shadow:var(--shadow-lift);">lift</div>
+        <span class="t-mono ink-3">shadow · lift</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOTION ─────────────────────────────────────────────────────────────── -->
+  <div class="token-row">
+    <div class="token-row-label">Motion</div>
+    <div>
+      <p class="t-small ink-3" style="margin-bottom: var(--space-5);">Hover a card to preview its timing.</p>
+      <div class="motion-grid">
+        <div class="motion-card" data-dur="fast">
+          <div class="motion-row">
+            <span class="t-mono" style="font-weight:500;">fast</span>
+            <span class="t-mono ink-3">{{DURATION_FAST}}</span>
+          </div>
+          <div class="motion-track"><div class="motion-fill"></div></div>
+          <span class="t-mono ink-3" style="font-size:11px;">{{EASING_STANDARD}}</span>
+        </div>
+        <div class="motion-card" data-dur="base">
+          <div class="motion-row">
+            <span class="t-mono" style="font-weight:500;">base</span>
+            <span class="t-mono ink-3">{{DURATION_BASE}}</span>
+          </div>
+          <div class="motion-track"><div class="motion-fill"></div></div>
+          <span class="t-mono ink-3" style="font-size:11px;">{{EASING_STANDARD}}</span>
+        </div>
+        <div class="motion-card" data-dur="slow">
+          <div class="motion-row">
+            <span class="t-mono" style="font-weight:500;">slow</span>
+            <span class="t-mono ink-3">{{DURATION_SLOW}}</span>
+          </div>
+          <div class="motion-track"><div class="motion-fill"></div></div>
+          <span class="t-mono ink-3" style="font-size:11px;">{{EASING_ENTRANCE}}</span>
+        </div>
+        <div class="motion-card" data-dur="enter">
+          <div class="motion-row">
+            <span class="t-mono" style="font-weight:500;">entrance</span>
+            <span class="t-mono ink-3">{{DURATION_SLOW}}</span>
+          </div>
+          <div class="motion-track"><div class="motion-fill"></div></div>
+          <span class="t-mono ink-3" style="font-size:11px;">{{EASING_ENTRANCE}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<hr class="hairline">
+
+<!-- ─── §03 ATOMS ────────────────────────────────────────────────────────── -->
+<section class="section container" id="atoms">
+  <div class="section-header">
+    <div class="section-index">
+      <span class="section-num">03</span>
+      <span class="t-eyebrow">Atoms</span>
+    </div>
+    <div class="stack">
+      <h2 class="t-headline">Smallest reusable units</h2>
+      <p class="t-body ink-2" style="max-width: 480px;">Each atom is composable from tokens alone. Any atom using an unlisted value flags an incomplete token set.</p>
+    </div>
+  </div>
+
+  <div class="atom-grid">
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Button · primary</span></div>
+      <div class="atom-stage"><a class="btn btn-primary" href="#">{{LABEL}}</a></div>
+      <div class="atom-anatomy">bg <b>ink.primary</b> · text <b>ink.inverse</b><br>pad <b>14 × 32</b> · radius <b>md</b></div>
+    </div>
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Button · ghost</span></div>
+      <div class="atom-stage"><a class="btn btn-ghost" href="#">{{LABEL}}</a></div>
+      <div class="atom-anatomy">bg <b>transparent</b> · border <b>hairline</b><br>pad <b>14 × 32</b> · radius <b>md</b></div>
+    </div>
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Eyebrow label</span></div>
+      <div class="atom-stage"><span class="t-eyebrow" style="color:var(--color-ink-primary);">{{LABEL}}</span></div>
+      <div class="atom-anatomy">11px mono · tracked 0.10em<br>uppercase · weight 600</div>
+    </div>
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Inline code</span></div>
+      <div class="atom-stage"><span>Run <span class="inline-code">{{CODE}}</span> to start</span></div>
+      <div class="atom-anatomy">mono · bg <b>surface</b> · border <b>hairline</b><br>pad <b>2 × 7</b> · radius <b>sm</b></div>
+    </div>
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Badge · pill</span></div>
+      <div class="atom-stage"><span class="badge">{{LABEL}}</span></div>
+      <div class="atom-anatomy">12px · pad <b>4 × 12</b><br>radius <b>pill</b> · border <b>hairline</b></div>
+    </div>
+
+    <div class="atom-card">
+      <div class="atom-header"><span class="atom-name">Hairline rule</span></div>
+      <div class="atom-stage"><hr class="hairline" style="width:100%;"></div>
+      <div class="atom-anatomy">1px · color <b>rule.hairline</b></div>
+    </div>
+
+    <!-- Add brand-specific atoms here (Phase 3) -->
+
+  </div>
+</section>
+
+<hr class="hairline">
+
+<!-- ─── §04 COMPONENTS ───────────────────────────────────────────────────── -->
+<section class="section container" id="components">
+  <div class="section-header">
+    <div class="section-index">
+      <span class="section-num">04</span>
+      <span class="t-eyebrow">Components</span>
+    </div>
+    <div class="stack">
+      <h2 class="t-headline">Reconstructions</h2>
+      <p class="t-body ink-2" style="max-width: 480px;">Each block is composed exclusively from the tokens and atoms above. Full anatomy is in README.</p>
+    </div>
+  </div>
+
+  <!-- Add one .recon-block per component documented in Phase 4 -->
+  <div class="recon-block">
+    <div class="recon-header">
+      <span class="recon-name">{{COMPONENT_NAME}}</span>
+      <span class="t-mono ink-3" style="font-size:11px;">{{VARIANT_COUNT}} variants</span>
+    </div>
+    <div class="recon-body">
+      <!-- Component reconstruction here -->
+    </div>
+  </div>
+
+</section>
+
+<hr class="hairline">
+
+<!-- ─── §05 METHODOLOGY & GAPS ───────────────────────────────────────────── -->
+<section class="section container" id="audit">
+  <div class="section-header">
+    <div class="section-index">
+      <span class="section-num">05</span>
+      <span class="t-eyebrow">Methodology</span>
+    </div>
+    <div>
+      <h2 class="t-headline">What I observed.<br>What I inferred.</h2>
+    </div>
+  </div>
+
+  <div class="audit-grid">
+    <div class="stack">
+      <p class="t-body">{{METHODOLOGY_PARAGRAPH}}</p>
+      <p class="t-small ink-3">Source: <span class="inline-code">{{SOURCE_URL}}</span></p>
+    </div>
+    <div>
+      <p class="t-small ink-3" style="margin-bottom: var(--space-4);">Items requiring manual verification:</p>
+      <div class="audit-items">
+        <div class="audit-item"><div class="audit-dot"></div><span>{{AUDIT_ITEM_1}}</span></div>
+        <div class="audit-item"><div class="audit-dot"></div><span>{{AUDIT_ITEM_2}}</span></div>
+        <div class="audit-item"><div class="audit-dot"></div><span>{{AUDIT_ITEM_3}}</span></div>
+        <div class="audit-item"><div class="audit-dot"></div><span>{{AUDIT_ITEM_4}}</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ───────────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">{{BRAND}}</div>
+        <div class="footer-meta">Design system extraction · Reconstructed from public source</div>
+      </div>
+      <div class="footer-files">
+        tokens.json<br>
+        preview.html<br>
+        README.md
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

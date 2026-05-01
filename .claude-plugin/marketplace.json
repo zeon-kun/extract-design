@@ -1,0 +1,21 @@
+{
+  "name": "extract-design",
+  "description": "Marketplace identifier for extract-design plugin.",
+  "owner": {
+    "name": "Muhammad Rafif Tri Risqullah",
+    "email": "rafif.zeon@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "extract-design",
+      "description": "A dedicated pipeline to extract design comprehensively from tokens, atoms, and sub-components (DOM analysis included). Produces a three-file deliverable: tokens.json, preview.html, README.md.",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Muhammad Rafif Tri Risqullah",
+        "email": "rafif.zeon@gmail.com",
+        "url": "https://github.com/zeon-kun"
+      }
+    }
+  ]
+}
