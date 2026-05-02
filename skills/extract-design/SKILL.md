@@ -64,16 +64,20 @@ Full details in `references/workflow.md`.
 
 ## Outputs
 
-Always produce these three files, in this order:
+Every extraction run writes to a dedicated directory in the current project:
 
 ```
-{output-dir}/
-├── tokens.json     ← machine-readable design tokens with confidence flags
-├── preview.html    ← self-contained one-pager, styled in source's aesthetic
-└── README.md       ← brand identity write-up + extraction methodology
+.extract-design/<brand-slug>/
+├── capture-manifest.json   ← Playwright capture index + confirmed DOM data (Phase 1)
+├── screenshots/            ← Playwright screenshots (viewports, scroll, hover)
+├── tokens.json             ← machine-readable design tokens with confidence flags
+├── preview.html            ← self-contained one-pager, styled in source's aesthetic
+└── README.md               ← brand identity write-up + extraction methodology
 ```
 
-Use the templates in `templates/` as starting scaffolds. They have the structure pre-wired and the token CSS variables already plumbed through.
+`<brand-slug>` is derived from the target URL hostname (`stripe.com` → `stripe`). The user can override it with an explicit name.
+
+Use the templates in `templates/` as starting scaffolds for `tokens.json`, `preview.html`, and `README.md`. They have the structure pre-wired and the token CSS variables already plumbed through.
 
 ## Reading order
 
@@ -81,9 +85,10 @@ When this skill is loaded, read in this order:
 
 1. This file (you're here)
 2. `references/workflow.md` — the full 7-phase playbook
-3. `references/component-anatomy.md` — **read carefully, this is a non-negotiable**
-4. `references/motion-extraction.md` — **read carefully, this is a non-negotiable**
-5. `references/custom-implementation.md` — **read carefully, this is a non-negotiable** for any site using canvas/WebGL/manual SVG
-6. `references/atom-checklist.md` — the canonical atom set
-7. `references/preview-principles.md` — what makes a good preview
-8. `references/token-schema.md` — exact JSON schema with confidence flags
+3. `references/playwright-screenshots.md` — capture protocol, output directory, manifest structure
+4. `references/component-anatomy.md` — **read carefully, this is a non-negotiable**
+5. `references/motion-extraction.md` — **read carefully, this is a non-negotiable**
+6. `references/custom-implementation.md` — **read carefully, this is a non-negotiable** for any site using canvas/WebGL/manual SVG
+7. `references/atom-checklist.md` — the canonical atom set
+8. `references/preview-principles.md` — what makes a good preview
+9. `references/token-schema.md` — exact JSON schema with confidence flags

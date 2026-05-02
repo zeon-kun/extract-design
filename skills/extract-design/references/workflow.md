@@ -8,16 +8,48 @@ Run every phase. Don't skip ahead.
 
 **Goal:** Capture both the *computed truth* (CSS, source) and the *visual truth* (rendered pixels). The two together prevent hallucinated tokens.
 
-**Steps:**
-1. **Fetch the source.** If URL: use `web_fetch`. If screenshot: read it visually.
-2. **Get visual reference.** Even if you have the source, look at how it renders. Use `image_search` for screenshots of the live site if direct access is blocked. Mobile and desktop both, where possible.
-3. **Detect motion libraries and custom rendering.** Look at script tags and the DOM. Identify GSAP, Framer Motion, Lottie, Three.js, R3F, particles libraries, smooth-scroll libraries (Lenis), or any `<canvas>` / WebGL contexts. See `motion-extraction.md` Phase 1 addendum for the full detection table. **Mark library as `unknown` rather than guessing if not directly observable.**
-4. **Inventory assets.** List every image/SVG URL referenced in the source. Note naming conventions (`-mono.svg`, `_halftone.svg` etc. — these reveal design rules). Include any Lottie `.json` files or shader source URLs.
-5. **Note what you couldn't get.** If CSS bundles are inaccessible, write that down. Phase 7 will reference these gaps.
+### Output directory
 
-**Output of this phase:** A short observations note (kept in scratch, not delivered) listing what's confirmed vs. what needs inference, including motion library inventory.
+Before doing anything else, establish the output directory for this extraction run:
+
+```
+.extract-design/<brand-slug>/
+```
+
+Derive `<brand-slug>` from the target URL's hostname (`stripe.com` → `stripe`, `linear.app` → `linear`). If the user supplied an explicit name, use that instead. All three deliverables (`tokens.json`, `preview.html`, `README.md`) and all Playwright captures write to this directory.
+
+### Steps
+
+1. **Run Playwright capture.** This is the primary reconnaissance tool. It produces rendered screenshots, confirmed CSS tokens, and motion library signals in one pass.
+
+   ```bash
+   node scripts/playwright-capture.mjs <url> .extract-design/<brand-slug>
+   ```
+
+   This runs Stages A–E (viewports, DOM analysis, scroll traversal, hover states, manifest). Full details in `playwright-screenshots.md`.
+
+   If Playwright is unavailable (`npx playwright install chromium` not run), fall back to step 1b and note it in the Phase 7 gaps list.
+
+   **1b. Fallback — `web_fetch` + `image_search`.** Use `web_fetch` for the HTML/CSS source. Use `image_search` for visual references. Mark all visual tokens as `inferred` or `inferred-likely` — no confirmed CSS vars are available on this path.
+
+2. **Fetch the raw source.** Run `web_fetch` on the URL regardless of whether Playwright succeeded. The raw HTML/CSS gives you asset URLs, inline styles, and accessibility attributes that the rendered DOM doesn't expose. If screenshot input only: skip this step.
+
+3. **Read the capture manifest.** Open `.extract-design/<brand-slug>/capture-manifest.json`. Extract:
+   - `domData.cssVars` → seed Phase 2 color/space/radius tokens as `confirmed`
+   - `domData.fontFamilies` → seed Phase 2 typography tokens as `confirmed`
+   - `domData.scriptSrcs` → scan for motion library signals (see step 4)
+   - `domData.computedStyles` → cross-check visual token values
+
+4. **Detect motion libraries and custom rendering.** Scan `manifest.domData.scriptSrcs` for known strings. Identify GSAP, Framer Motion, Lottie, Three.js, R3F, particles libraries, smooth-scroll libraries (Lenis), or any `<canvas>` / WebGL contexts. Also check the raw source for `<canvas>` elements and WebGL context creation. See `motion-extraction.md` Phase 1 addendum for the full detection table. **Mark library as `unknown` rather than guessing if not directly observable.**
+
+5. **Inventory assets.** List every image/SVG URL referenced in the raw source. Note naming conventions (`-mono.svg`, `_halftone.svg` etc. — these reveal design rules). Include any Lottie `.json` files or shader source URLs.
+
+6. **Note what you couldn't get.** If Playwright failed, if CSS bundles are inaccessible, or if the page is auth-gated, write that down. Phase 7 will reference these gaps.
+
+**Output of this phase:** A short observations note (kept in scratch, not delivered) listing what's confirmed vs. what needs inference, including motion library inventory and any capture failures.
 
 **Failure modes:**
+- Skipping Playwright and going straight to `web_fetch` — you lose rendered pixels, computed styles, and hover states, which forces every token to `inferred`.
 - Trusting markdown extraction alone — it strips CSS context.
 - Skipping the visual check because "the source code is enough."
 - Not noting access failures — they become silent guesses later.
