@@ -42,21 +42,23 @@ These are the rules. Violations make the deliverable worthless.
 
 ## Workflow
 
-Run all seven phases in order. Don't skip Phase 1 just because the URL "looks simple."
+Run all phases in order. Don't skip Phase 0 — it prevents permission interruptions for the rest of the run.
 
-**Phase 1 — Reconnaissance.** Fetch the source. Get content + visual references. **Detect motion libraries and custom rendering** (GSAP, Framer Motion, Lottie, Three.js, canvas). See `references/workflow.md` §1 and `references/motion-extraction.md` Phase 1 addendum.
+**Phase 0 — Pre-flight.** Write the project's `.claude/settings.json` allowlist so every subsequent Bash call in the session is auto-approved. Create the output directory. See `references/workflow.md` §0.
+
+**Phase 1 — Reconnaissance.** Fetch the source. Get content + visual references. **Detect motion libraries and custom rendering** (GSAP, Framer Motion, Lottie, Three.js, canvas). **Structural scoring auto-detects atoms and compound components** (works on Tailwind, CSS-in-JS hashed names, and custom BEM — no class-name dependency). See `references/workflow.md` §1 and `references/motion-extraction.md` Phase 1 addendum.
 
 **Phase 2 — Token extraction.** Pull primitives: color, type, space, radius, shadow, motion. Rank by frequency. See `references/workflow.md` §2.
 
-**Phase 3 — Atom identification.** Map the smallest reusable units. See `references/atom-checklist.md` for the canonical set.
+**Phase 3 — Atom identification.** Map the smallest reusable units. Reads `manifest.atoms` as the starting inventory — each entry has multi-state screenshots (default/hover/focus) captured automatically. See `references/atom-checklist.md` for the canonical set.
 
-**Phase 4 — Component anatomy.** Decompose every component into named sub-elements with full specs. **This is a non-negotiable phase.** See `references/component-anatomy.md`.
+**Phase 4 — Component anatomy.** Decompose every component into named sub-elements with full specs. **This is a non-negotiable phase.** Reads `manifest.componentStates` as the starting inventory — each entry has state screenshots (default/hover/child-hover/active/focus) for direct token diffing. See `references/component-anatomy.md`.
 
 **Phase 4.5 — Motion + custom implementation extraction.** Document every motion pattern (CSS, JS, scroll-driven, Lottie) and every custom rendering (canvas, WebGL, manual SVG). **Also non-negotiable.** See `references/motion-extraction.md` and `references/custom-implementation.md`.
 
 **Phase 5 — Brand identity synthesis.** Voice, principles, photography treatment, motion character. The qualitative layer.
 
-**Phase 6 — One-pager preview.** Build `preview.html` using only the extracted tokens. The preview itself must be styled in the source brand's aesthetic, and should reconstruct motion/custom impls where feasible (or show labeled static frames). See `references/preview-principles.md`.
+**Phase 6 — One-pager preview.** Build `preview.html` using only the extracted tokens. The preview itself must be styled in the source brand's aesthetic, and should reconstruct motion/custom impls where feasible (or show labeled static frames). **Write the file section-by-section using the Edit-append pattern — never output the full HTML in context.** See `references/preview-principles.md` and `references/workflow.md` §6.
 
 **Phase 7 — Self-audit.** Compare reconstruction to source. Flag gaps. List items requiring manual verification — including motion library confidence and custom impl reconstruction trade-offs.
 

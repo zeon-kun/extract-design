@@ -217,6 +217,19 @@ The preview:
 
 ## 7. Methodology & gaps
 
+### Detection method
+
+Atoms and components were discovered by **structural + visual scoring** — no class-name reads. The capture script walks the DOM with a `TreeWalker`, applies hard gates (size, visibility, interactivity), then scores each candidate on signals like `box-shadow`, `border-radius`, `transition`, padding, and sibling repetition. Class names, framework conventions, and BEM structures are never consulted.
+
+| Metric | Count |
+|---|---|
+| Atoms discovered (`manifest.atoms.length`) | {{ATOM_COUNT}} |
+| Components discovered (`manifest.componentStates.length`) | {{COMPONENT_COUNT}} |
+| Canonical-checklist atoms matched | {{CHECKLIST_MATCHED}} / {{CHECKLIST_TOTAL}} |
+| Canonical-checklist atoms not observed | {{CHECKLIST_MISSING}} |
+
+Known detection limits: shadow DOM (closed roots), cross-origin iframes, auth-gated routes, and components rendered purely via `::before`/`::after` pseudo-elements are not captured. See manual verification checklist below.
+
 ### What was confirmed
 {{CONFIRMED_LIST}}
 

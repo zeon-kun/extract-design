@@ -4,6 +4,70 @@ Run every phase. Don't skip ahead.
 
 ---
 
+## Phase 0 — Pre-flight: permissions + output directory
+
+**Do this before anything else.** It eliminates permission interruptions for the entire extraction run (typically 15–20 minutes).
+
+### 0a. Derive the script's absolute path
+
+You are reading this file from a known absolute path that ends in `skills/extract-design/references/workflow.md`. Strip that suffix and append `scripts/playwright-capture.mjs` to get the Playwright capture script's full path.
+
+Example: if this file is at `/home/alice/.claude/plugins/extract-design/skills/extract-design/references/workflow.md`, the script is at `/home/alice/.claude/plugins/extract-design/scripts/playwright-capture.mjs`.
+
+Call this value `$SCRIPT_ABS_PATH`. You will use it in the next step and in every Playwright invocation throughout the skill.
+
+### 0b. Write the project allowlist
+
+Read `.claude/settings.json` in the **user's current working directory** (not the plugin directory). If the file does not exist, start from `{}`. Merge the entries below into `permissions.allow` — append without removing any existing entries — then write the file back using the Write tool. Replace `$SCRIPT_ABS_PATH` with the value derived in step 0a.
+
+```json
+[
+  "Bash(node $SCRIPT_ABS_PATH *)",
+  "Bash(npx playwright install *)",
+  "Bash(npx playwright *)",
+  "Bash(mkdir -p .extract-design/*)",
+  "Bash(mkdir .extract-design/*)",
+  "Bash(ls .extract-design/*)",
+  "Bash(node --version)",
+  "Bash(which node)"
+]
+```
+
+Merge example — existing file, adding the new entries:
+```json
+{
+  "permissions": {
+    "allow": [
+      "existing-entry",
+      "Bash(node /absolute/path/to/plugin/scripts/playwright-capture.mjs *)",
+      "Bash(npx playwright install *)",
+      "Bash(npx playwright *)",
+      "Bash(mkdir -p .extract-design/*)",
+      "Bash(mkdir .extract-design/*)",
+      "Bash(ls .extract-design/*)",
+      "Bash(node --version)",
+      "Bash(which node)"
+    ]
+  }
+}
+```
+
+If `.claude/settings.json` is absent, create it with just the permissions block. Do not touch any other keys.
+
+**After this write, every Bash call in the remaining phases is auto-approved.** You will not be interrupted for individual command approvals again.
+
+### 0b. Create the output directory
+
+```bash
+mkdir -p .extract-design/<brand-slug>/screenshots
+```
+
+Derive `<brand-slug>` from the target URL's hostname (`stripe.com` → `stripe`, `linear.app` → `linear`). Use the user's explicit name if provided.
+
+All deliverables and Playwright captures write to `.extract-design/<brand-slug>/`.
+
+---
+
 ## Phase 1 — Reconnaissance
 
 **Goal:** Capture both the *computed truth* (CSS, source) and the *visual truth* (rendered pixels). The two together prevent hallucinated tokens.
@@ -23,8 +87,9 @@ Derive `<brand-slug>` from the target URL's hostname (`stripe.com` → `stripe`,
 1. **Run Playwright capture.** This is the primary reconnaissance tool. It produces rendered screenshots, confirmed CSS tokens, and motion library signals in one pass.
 
    ```bash
-   node scripts/playwright-capture.mjs <url> .extract-design/<brand-slug>
+   node $SCRIPT_ABS_PATH <url> .extract-design/<brand-slug>
    ```
+   where `$SCRIPT_ABS_PATH` is the absolute path derived in Phase 0 step 0a.
 
    This runs Stages A–E (viewports, DOM analysis, scroll traversal, hover states, manifest). Full details in `playwright-screenshots.md`.
 
@@ -39,6 +104,10 @@ Derive `<brand-slug>` from the target URL's hostname (`stripe.com` → `stripe`,
    - `domData.fontFamilies` → seed Phase 2 typography tokens as `confirmed`
    - `domData.scriptSrcs` → scan for motion library signals (see step 4)
    - `domData.computedStyles` → cross-check visual token values
+   - `manifest.atoms` → seed Phase 3 atom inventory; each entry has `slug`, `label`, `score`, and `stateFiles` (default/hover/focus screenshots). Open the state files to observe hover and focus token changes directly.
+   - `manifest.componentStates` → seed Phase 4 component inventory; each entry has `slug`, `label`, `score`, and `stateFiles` (default/hover/child-hover/active/focus screenshots). Open state sets to diff which tokens change per state.
+
+   Both `atoms` and `componentStates` are discovered by structural + visual scoring — never by class name — so they populate correctly on Tailwind sites, CSS-in-JS (hashed names), and custom BEM equally.
 
 4. **Detect motion libraries and custom rendering.** Scan `manifest.domData.scriptSrcs` for known strings. Identify GSAP, Framer Motion, Lottie, Three.js, R3F, particles libraries, smooth-scroll libraries (Lenis), or any `<canvas>` / WebGL contexts. Also check the raw source for `<canvas>` elements and WebGL context creation. See `motion-extraction.md` Phase 1 addendum for the full detection table. **Mark library as `unknown` rather than guessing if not directly observable.**
 
@@ -86,7 +155,13 @@ Derive `<brand-slug>` from the target URL's hostname (`stripe.com` → `stripe`,
 
 ## Phase 3 — Atom identification
 
-**Goal:** Map the smallest reusable units.
+**Goal:** Map the smallest reusable units. Start from the manifest's captured atoms, then check against the canonical list for gaps.
+
+**Starting point — `manifest.atoms`:** Each entry in `manifest.atoms` is a structurally-discovered atom with multi-state screenshots. Map each entry onto the canonical checklist in `atom-checklist.md`:
+1. Open the atom's `stateFiles.default` screenshot to confirm what it looks like.
+2. Open `stateFiles.hover` and `stateFiles.focus` (if present) to document its interactive token changes.
+3. Classify it against the checklist's semantic categories (button-primary, link-inline, badge, input-text, etc.). The manifest's `label` field is a structural hint — use it as a starting point, not the final word.
+4. After mapping all manifest entries, scan the checklist for items that did **not** appear in the manifest. Mark those `not-present-on-source` or flag them for manual verification if the site is likely to have them.
 
 See `atom-checklist.md` for the canonical list. The minimum set: button (primary + variants), link, eyebrow label, inline code, badge/tag, icon, hairline rule, input field (if present), and any brand-specific atoms (a numeral treatment, a step indicator, a halftone overlay).
 
@@ -110,6 +185,11 @@ A component is **not** "a card with padding and a shadow." A component is:
 - **Custom interactivity** (if the card has a parallax hover, document the parallax. If a hero has a marquee, document the timing.)
 
 Read `component-anatomy.md` carefully before doing this phase.
+
+**Starting point — `manifest.componentStates`:** Each entry is a structurally-discovered compound component with a full state screenshot set. Use the manifest as the starting inventory for this phase:
+1. For every entry in `manifest.componentStates`, open its state screenshot set (`default`, `hover`, `child0-hover`, `active`, `focus`) and diff them visually. This is the ground truth for which tokens change per state — use it, don't guess.
+2. The entry's `label` field (e.g., `card`, `tile`, `article`) is a structural hint for classification. Confirm it against the screenshots.
+3. After documenting all manifest components, scan the Phase 1 `desktop-full.png` and `scroll-*.png` screenshots for additional compound components that the structural detector may have missed (e.g., components only visible via scroll, or behind auth). Document those manually with the same anatomy depth.
 
 ---
 
@@ -185,6 +265,24 @@ See `preview-principles.md`. Key rules:
 - Itself styled in the source brand's voice — texture, type, color, motion
 - **Spatial sections must work at every breakpoint.** Test mobile, tablet, desktop. Use `clamp()` for fluid type. Always add media queries for grid layouts that drop columns.
 
+### Incremental writing protocol (critical — do not skip)
+
+**Never generate the complete HTML in your conversational response.** Writing 500–1000 lines of HTML as a code block burns 100k+ tokens and loses context needed for the later self-audit. Write the file in sections instead:
+
+1. **First Write call** — `<head>` + all CSS (`:root` tokens + every class definition). Use the Write tool to create the file from scratch.
+2. **Section appends** — For each HTML section (nav, header, §01 through §05, footer), use the Edit tool to replace the closing `</body></html>` with the new section + `</body></html>`. Each Edit call carries only one section of HTML.
+3. **Never re-output the full file.** If you need to check what's in the file, use the Read tool — don't reproduce it in conversation.
+
+Edit-append pattern (repeat for each section):
+```
+Edit: replace "</body></html>"
+with:  <section ...>...</section>\n</body></html>
+```
+
+This keeps every individual tool call small. The file on disk accumulates correctly.
+
+**Before the first Write call**, open the Phase 1 screenshots (`desktop-fold.png`, `desktop-full.png`) and read them — the visual reference should drive every layout choice in Phase 6. Brand styling in the preview must match what you observed in those screenshots.
+
 ---
 
 ### `--pencil` flag (optional) — pixel-perfect Pencil canvas preview
@@ -251,9 +349,12 @@ Follow the Code guide to generate production-ready code from the approved Pencil
 
 **Checklist:**
 1. **Diff reconstructions vs. source.** Open the preview side-by-side with the original. For each major component, ask: would someone mistake one for the other at a glance? If no, iterate.
-2. **List unverified inferences.** Every `inferred` token in the JSON should appear in the audit list with a verification path ("inspect element on the live site to confirm hex").
-3. **List access failures from Phase 1.** If you couldn't fetch the CSS bundle, say so explicitly.
-4. **Suggest manual verification steps.** Ideally with browser devtools instructions.
+2. **Audit manifest capture quality.** For every entry in `manifest.atoms` and `manifest.componentStates`, confirm: (a) the reconstruction in the preview matches the captured `default` screenshot, and (b) the hover/active/focus states documented in the anatomy match the corresponding state screenshots. Flag any atom or component where reconstruction diverges visibly.
+3. **Flag manifest gaps.** List any canonical-checklist atoms (from `atom-checklist.md`) that do NOT appear in `manifest.atoms`. For each, note: was it absent from the site, or did the structural detector miss it? If the latter, add a manual verification step.
+4. **List unverified inferences.** Every `inferred` token in the JSON should appear in the audit list with a verification path ("inspect element on the live site to confirm hex").
+5. **List access failures from Phase 1.** If you couldn't fetch the CSS bundle, say so explicitly.
+6. **Suggest manual verification steps.** Ideally with browser devtools instructions.
+7. **Note detection method.** Record in `README.md` § Methodology & gaps: how many atoms and components were detected (`manifest.atoms.length` / `manifest.componentStates.length`), how many canonical-checklist atoms were matched, and any detection limits encountered (auth-gated routes, shadow DOM, cross-origin iframes).
 
 **`--pencil` path addition:** Run `mcp__pencil__snapshot_layout` with `problemsOnly: true` on the approved `.pen` file. Any clipped or overflowing nodes go into the audit gaps list. Use `mcp__pencil__get_screenshot` per component frame for the side-by-side diff rather than the HTML preview.
 
