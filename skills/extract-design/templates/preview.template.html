@@ -834,6 +834,19 @@
 <hr class="hairline">
 
 <!-- ─── §03 ATOMS ────────────────────────────────────────────────────────── -->
+<!--
+  PHASE 3 INSTRUCTIONS — MANIFEST-DRIVEN ATOMS
+  ─────────────────────────────────────────────
+  Replace the placeholder .atom-card blocks below with entries from manifest.atoms.
+  For each entry in manifest.atoms:
+    1. Open stateFiles.default to observe the atom at rest → reconstruct it live here.
+    2. Open stateFiles.hover / stateFiles.focus to confirm interactive token changes.
+    3. Put the atom's slug and label in the .atom-header.
+    4. Put reconstructed token names in .atom-anatomy.
+  After covering all manifest.atoms entries, add cards for any canonical-checklist
+  atoms not captured by the manifest — give those a "not-observed" badge in the
+  .atom-anatomy footer so the gap is visible, not silent.
+-->
 <section class="section container" id="atoms">
   <div class="section-header">
     <div class="section-index">
@@ -884,7 +897,7 @@
       <div class="atom-anatomy">1px · color <b>rule.hairline</b></div>
     </div>
 
-    <!-- Add brand-specific atoms here (Phase 3) -->
+    <!-- Add remaining atoms from manifest.atoms + brand-specific atoms from Phase 3 -->
 
   </div>
 </section>
@@ -892,6 +905,21 @@
 <hr class="hairline">
 
 <!-- ─── §04 COMPONENTS ───────────────────────────────────────────────────── -->
+<!--
+  PHASE 4 INSTRUCTIONS — MANIFEST-DRIVEN COMPONENTS
+  ──────────────────────────────────────────────────
+  Replace the placeholder .recon-block below with one block per entry in
+  manifest.componentStates. For each entry:
+    1. Open stateFiles.default → use as pixel reference for the reconstruction.
+    2. Open stateFiles.hover / stateFiles.active / stateFiles.focus → document
+       which tokens change; show in the anatomy footer.
+    3. The .recon-header shows the component's slug and label.
+    4. The .recon-body contains: (a) the live CSS reconstruction, and (b) small
+       thumbnail images of the state screenshots labelled default / hover / focus
+       so the viewer can compare source and reconstruction side-by-side.
+  Do not collapse multiple components into one block. Complex components (hero,
+  pricing grid, feature section) each get their own .recon-block.
+-->
 <section class="section container" id="components">
   <div class="section-header">
     <div class="section-index">
@@ -904,7 +932,7 @@
     </div>
   </div>
 
-  <!-- Add one .recon-block per component documented in Phase 4 -->
+  <!-- Add one .recon-block per entry in manifest.componentStates (Phase 4) -->
   <div class="recon-block">
     <div class="recon-header">
       <span class="recon-name">{{COMPONENT_NAME}}</span>

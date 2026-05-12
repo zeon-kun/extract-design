@@ -2,6 +2,28 @@
 
 This is the most important reference in the skill. If you skip this depth, the deliverable fails.
 
+## Starting point — `manifest.componentStates`
+
+Before doing any manual inspection, open `capture-manifest.json` and locate `componentStates`. Each entry was discovered by structural scoring and comes with a full state screenshot set:
+
+```
+manifest.componentStates[i].stateFiles.default    ← anatomy baseline
+manifest.componentStates[i].stateFiles.hover       ← diff → box-shadow, transform, bg tokens
+manifest.componentStates[i].stateFiles.child0-hover ← diff → link color, underline, arrow reveal
+manifest.componentStates[i].stateFiles.active      ← diff → pressed bg, scale
+manifest.componentStates[i].stateFiles.focus       ← diff → outline-color, outline-width
+```
+
+For each entry:
+1. Open the `default` screenshot as the anatomy baseline.
+2. Diff `default → hover` to identify which tokens change (elevation, color, transform).
+3. Diff `default → focus` to identify focus ring tokens (color, width, offset).
+4. Use the visual diffs as ground truth for the **States** section of the anatomy below — do not invent values, read them from the screenshots.
+
+After documenting all manifest components, scan `desktop-full.png` and `scroll-*.png` for additional compound components the detector may have missed (e.g., scroll-hidden, auth-gated) and document those with the same depth.
+
+---
+
 ## The rule
 
 A component is **never** documented as a single line. Every sub-element gets a name, every sub-element gets tokens, every behavior gets specified.

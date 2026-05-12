@@ -202,21 +202,109 @@ if (!prefersReduced) {
 }
 ```
 
+## Writing protocol — token budget
+
+**Never output the complete HTML in your conversational response.** Write the file section by section using the Edit-append pattern described in `workflow.md` Phase 6. This prevents the 100k+ token burn that happens when the full file is generated in context.
+
+The only HTML that should appear in your response text is the small excerpt you're about to write in the next Edit call.
+
+---
+
+## Professional quality bar
+
+The preview must look like a real design system reference site — not a student assignment with boxes and `#000` everywhere. Below is the quality bar per section.
+
+### Visual hierarchy (applies to every section)
+
+One clear focal point per section. Use size, weight, and color to establish importance — not borders around everything. **Primary actions must be visually dominant.** If every element looks the same weight, reduce the secondary elements, not the primary one.
+
+### Header quality bar
+
+- The hero text must use the extracted brand's actual display font loaded via `@import` or `link` tag from Google Fonts / CDN if it's a web font.
+- Background, text, and CTA colors must come from the extracted tokens — not the template defaults.
+- If the brand uses a distinctive texture (grain, halftone, grid overlay), it must appear in the header.
+- The header must feel like a landing section, not a `<h1>` on a white div.
+
+### §01 Brand identity quality bar
+
+- Design principles are numbered with a hairline-separated list — not bullet points with `•`.
+- Each principle is a single opinionated sentence, not a paragraph.
+- Voice principles appear as a pull quote or styled callout, not a generic `<p>`.
+- The brand colors bleed into this section as accents (section number in accent color, hairlines in brand ink color).
+
+### §02 Tokens quality bar
+
+**Color swatches:**
+- Every confirmed token has its hex value displayed in mono font below the chip.
+- Confidence flags are shown (`confirmed` / `inferred-likely` / `inferred`) in a subdued mono label.
+- Dark/inverse colors must be displayed on a dark background — a white swatch chip for `#0A0A0A` is a failure.
+- Swatch chips are at least 100px tall — enough to read the color at a glance.
+
+**Typography scale:**
+- Each row shows a live sample in the actual brand font, not the fallback system font.
+- Hero / display sizes use `clamp()` and are visually large even in the specimen row.
+- The meta column (size, weight, tracking) uses mono font for scannability.
+
+**Space ruler:**
+- The bar widths are proportional to the actual values — not all the same width.
+- Each bar row shows the CSS token name AND the px value side by side.
+
+**Motion tokens:**
+- Each motion card is interactive — hovering plays the timing curve visually.
+- Duration values match the extracted tokens exactly.
+
+### §03 Atoms quality bar
+
+- **Drive from `manifest.atoms`.** Every entry in `manifest.atoms` gets at least one atom card in this section. Open each entry's `stateFiles.default` screenshot to verify the reconstruction matches.
+- Canonical-checklist atoms that did NOT appear in `manifest.atoms` are still rendered in the grid — give them a `not-observed` badge (a small muted label in the card footer) so the gap is explicit rather than invisible.
+- Every atom card has a live rendered demo in its stage, not a label saying "button goes here."
+- Atom stages have consistent min-height (120px) with the element centered.
+- The anatomy footer shows the actual token names used (e.g. `bg ink.primary · radius md`), not English prose.
+- Brand-specific atoms must be included — if the brand has a distinctive badge, pill, step indicator, or icon treatment, those atoms appear here.
+- Cards use `display: flex; flex-direction: column` so all cards in a row are the same height.
+
+### §04 Components quality bar
+
+- **Drive from `manifest.componentStates`.** Every entry in `manifest.componentStates` gets its own `recon-block`. Use the entry's `stateFiles.default` screenshot as the pixel reference — compare side-by-side before declaring the reconstruction complete.
+- Show the state matrix for each component: place `default`, `hover`, and `focus` screenshots next to the CSS reconstruction so the viewer can see both source and reconstruction in one view. Label each screenshot thumbnail with its state name.
+- Each component block shows a pixel-faithful reconstruction using only the extracted tokens.
+- Component blocks are not empty or filled with `{{placeholder}}` text — they have realistic content (real product names, plausible emails, actual copy that matches the brand's voice).
+- States are shown: if a card has a hover lift, show `hover: box-shadow var(--shadow-lift)` in the anatomy footer. The hover token value must come from the `default → hover` screenshot diff, not guessed.
+- Complex components (hero, pricing grid, feature section) get their own `recon-block` — don't collapse multiple components into one block.
+
+### §05 Methodology quality bar
+
+- Audit items are specific, not generic. "Typography weights may be inferred" is a failure. "Heading weight — visually read as 600; confirm via DevTools → `font-weight` on `.hero-headline`" is correct.
+- The source URL appears as a clickable `<a>` in `inline-code` style.
+- Confirmed vs. inferred breakdown is quantified: "14 of 22 tokens confirmed from CSS vars; 8 inferred visually."
+
+### Footer quality bar
+
+- The brand name in the footer must use the display font at a large size (40px+).
+- Background is the brand's dark/inverse color, not generic `#0A0A0A`.
+- If the brand uses a logo SVG (identified in Phase 1 asset inventory), embed or link it here.
+
+---
+
 ## Testing the preview
 
 Before declaring done:
 
-1. **Resize the window** from 1440px down to 320px continuously. Watch for:
+1. **Open the Phase 1 screenshots** (`desktop-fold.png`, `desktop-full.png`). Compare against the live preview. Every section should feel visually connected to the source brand.
+
+2. **Resize the window** from 1440px down to 320px continuously. Watch for:
    - Text overflowing containers
    - Grids not collapsing
    - Code blocks adding horizontal scroll to the page
    - Buttons wrapping awkwardly
    - Type that's too large on mobile
 
-2. **Tab through the page.** Every interactive element should have a visible focus state.
+3. **Tab through the page.** Every interactive element should have a visible focus state.
 
-3. **View source.** The HTML should be human-readable. No 5000-character class strings, no weird wrapper soup.
+4. **View source.** The HTML should be human-readable. No 5000-character class strings, no weird wrapper soup.
 
-4. **Disable JavaScript.** The preview must work without JS. (Marquee animations are fine since they're CSS-only.)
+5. **Disable JavaScript.** The preview must work without JS. (Marquee animations are fine since they're CSS-only.)
 
-5. **Compare side-by-side with the source.** This is Phase 7 and it's mandatory.
+6. **Compare side-by-side with the source.** This is Phase 7 and it's mandatory.
+
+**If the preview could pass as a generic spec sheet** — Inter on white, placeholder colors, no texture, no brand personality — it has failed the quality bar. Redo it.

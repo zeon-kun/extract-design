@@ -1,6 +1,25 @@
 # Atom Checklist
 
-The smallest reusable units. During Phase 3, walk this list and document every atom that exists on the source. Mark missing ones explicitly so the gap is visible.
+The smallest reusable units. During Phase 3, start from the manifest's captured atoms, then use this checklist to find gaps.
+
+## Starting point — `manifest.atoms`
+
+Before walking the checklist below, open `capture-manifest.json` and locate `atoms`. Each entry was discovered by structural scoring (no class-name reading) and comes with state screenshots:
+
+```
+manifest.atoms[i].slug        ← e.g. "button-start-0"
+manifest.atoms[i].label       ← structural hint: "button", "link", "input", "badge", etc.
+manifest.atoms[i].stateFiles  ← { default, hover?, focus? }
+```
+
+**Workflow:**
+1. For each entry in `manifest.atoms`: open `stateFiles.default` to see the atom at rest, then classify it against the canonical set below (the `label` is a hint, not the final word).
+2. Open `stateFiles.hover` and `stateFiles.focus` to document the atom's interactive token changes.
+3. After mapping all manifest atoms, scan the canonical set below. Items not covered by any manifest entry are either absent from the source or missed by the detector. Mark each as `not-present-on-source` or add a manual verification step in Phase 7.
+
+`manifest.atoms[].label` provides a structural classification (`button`, `pill-link`, `input`, `badge`, `link`, `icon-button`, `atom`). Map these onto the semantic checklist categories as follows: `button`/`button-link` → button-primary/secondary, `link` → link-inline/standalone, `pill-link` → badge/tag/pill, `input` → input-text/search, etc.
+
+---
 
 ## Canonical atom set
 
